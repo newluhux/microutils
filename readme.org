@@ -1,10 +1,14 @@
-* uutils
+* microutils
 
-micro utils written by LuHui <luhux76@gmail>
+some micro tools written by LuHui <luhux76@gmail>
 
 ufbtest:       framebuffer test
 umemdump:      process memory dump
 ustardict:     dictionary
+
+** DEPEND
+
+libc
 
 ** INSTALL
 
