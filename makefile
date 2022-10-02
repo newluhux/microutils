@@ -1,4 +1,4 @@
-CFLAGS += -Wall -Wextra -Werror
+CFLAGS += -Wall -Wextra
 
 PREFIX ?= /usr/local
 
