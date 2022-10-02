@@ -1,0 +1,14 @@
+* uutils
+
+micro utils written by LuHui <luhux76@gmail>
+
+ufbtest:       framebuffer test
+umemdump:      process memory dump
+ustardict:     dictionary
+
+** INSTALL
+
+#+BEGIN_SRC shell
+make install
+#+END_SRC
+
