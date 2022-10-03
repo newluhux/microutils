@@ -88,6 +88,53 @@ void fbdev_fill(useconds_t delay, unsigned long long count) {
 	return;
 }
 
+void fbdev_draw_pixel(int x, int y, uint32_t color) {
+	int pos = y * fbdev_finfo.line_length +
+		x * sizeof(fbdev_vinfo.bits_per_pixel);
+	uint8_t *fbp8 = (uint8_t *)fbdev_mem + pos;
+	uint16_t *fbp16 = (uint16_t *)fbp8;
+	uint32_t *fbp32 = (uint32_t *)fbp8;
+	switch(fbdev_vinfo.bits_per_pixel) {
+	case 32:
+		*fbp32 = color;
+		break;
+	case 16:
+		*fbp16 = color;
+		break;
+	case 8:
+		*fbp8 = color;
+		break;
+	default:
+		*fbp8 = color;
+		break;
+	}
+	return;
+}
+
+void fbdev_draw_rect(int pos_x, int pos_y,
+		     int rect_h, int rect_w,
+		     uint32_t color) {
+	int i;
+
+	// up
+	for (i=pos_x;i<=pos_x+rect_w;i++) {
+		fbdev_draw_pixel(i,pos_y,color);
+	}
+	// down
+	for (i=pos_x;i<=pos_x+rect_w;i++) {
+		fbdev_draw_pixel(i,pos_y+rect_h,color);
+	}
+	// left
+	for (i=pos_y;i<=pos_y+rect_h;i++) {
+		fbdev_draw_pixel(pos_x,i,color);
+	}
+	// right
+	for (i=pos_y;i<=pos_y+rect_h;i++) {
+		fbdev_draw_pixel(pos_x+rect_w,i,color);
+	}
+	return;
+}
+
 void data_src_uninit(void) {
 	close(data_src_fd);
 }
