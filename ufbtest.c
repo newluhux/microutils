@@ -88,7 +88,7 @@ void fbdev_fill(useconds_t delay, unsigned long long count) {
 	return;
 }
 
-void fbdev_draw_pixel(int x, int y, uint32_t color) {
+void fbdev_draw_pixel(uint x, uint y, uint32_t color) {
 	int pos = y * fbdev_finfo.line_length +
 		x * sizeof(fbdev_vinfo.bits_per_pixel);
 	uint8_t *fbp8 = (uint8_t *)fbdev_mem + pos;
@@ -111,10 +111,10 @@ void fbdev_draw_pixel(int x, int y, uint32_t color) {
 	return;
 }
 
-void fbdev_draw_rect(int pos_x, int pos_y,
-		     int rect_h, int rect_w,
+void fbdev_draw_rect(uint pos_x, uint pos_y,
+		     uint rect_h, uint rect_w,
 		     uint32_t color) {
-	int i;
+	uint i;
 
 	// up
 	for (i=pos_x;i<=pos_x+rect_w;i++) {
@@ -135,6 +135,38 @@ void fbdev_draw_rect(int pos_x, int pos_y,
 	return;
 }
 
+void fbdev_fill_random_pixel(useconds_t delay, unsigned long long count,
+			     uint32_t color) {
+	srand(time(NULL));
+	uint x;
+	uint y;
+	while(count--) {
+		x = rand() % fbdev_vinfo.xres;
+		y = rand() % fbdev_vinfo.yres;
+		fbdev_draw_pixel(x,y,color);
+		usleep(delay);
+	}
+	return;
+}
+
+void fbdev_fill_random_rect(useconds_t delay, unsigned long long count,
+			    uint32_t color) {
+	uint x;
+	uint y;
+	uint w;
+	uint h;
+	srand(time(NULL));
+	while(count--) {
+		x = rand() % fbdev_vinfo.xres;
+		y = rand() % fbdev_vinfo.yres;
+		w = rand() % (fbdev_vinfo.xres - x);
+		h = rand() % (fbdev_vinfo.yres - y);
+		fbdev_draw_rect(x,y,h,w,color);
+		usleep(delay);
+	}
+	return;
+}
+
 void data_src_uninit(void) {
 	close(data_src_fd);
 }
@@ -148,17 +180,35 @@ void fbdev_uninit(void) {
 
 int main(int argc, char *argv[])
 {
-	if (argc < 3) {
-		fprintf(stderr,"Usage: %s update_delay update_count\n",argv[0]);
+	if (argc < 4) {
+		fprintf(stderr,
+			"Usage: %s mode delay count [hex]\n",
+			argv[0]);
 		exit(EXIT_FAILURE);
 	}
 	if (fbdev_init() == -1)
 		exit(EXIT_FAILURE);
-	if (data_src_init() == -1)
-		exit(EXIT_FAILURE);
 	fbdev_blank();
-	fbdev_fill(atoll(argv[1]),atoll(argv[2]));
-	data_src_uninit();
+
+	useconds_t delay = atoll(argv[2]);
+	unsigned long long count = strtoull(argv[3],NULL,10);
+	uint32_t color = 0xFFFFFFFF; // white
+	if (argc >= 5)
+		color = strtoll(argv[4],NULL,16);
+
+	int i;
+	for (i=0;i<argc;i++) {
+		if (strcmp(argv[1],"file") == 0) {
+			if (data_src_init() == -1)
+				exit(EXIT_FAILURE);
+			fbdev_fill(delay,count);
+			data_src_uninit();
+		} else if (strcmp(argv[1],"pixel") == 0) {
+			fbdev_fill_random_pixel(delay,count,color);
+		} else if (strcmp(argv[1],"rect") == 0) {
+			fbdev_fill_random_rect(delay,count,color);
+		}
+	}
 	fbdev_uninit();
 	return 0;
 }
