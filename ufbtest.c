@@ -15,6 +15,7 @@ static char *fbdev_fn = NULL;
 static int fbdev_fd = -1;
 static uint8_t *fbdev_mem = NULL;
 static struct fb_fix_screeninfo fbdev_finfo;
+static struct fb_var_screeninfo fbdev_vinfo;
 
 int fbdev_init(void)
 {
@@ -33,6 +34,11 @@ int fbdev_init(void)
 			"can't get %s FSCREENINFO, reason: %s\n",
 			fbdev_fn,strerror(errno));
 		return -1;
+	}
+	if (ioctl(fbdev_fd, FBIOGET_VSCREENINFO, &fbdev_vinfo) == -1) {
+		fprintf(stderr,
+			"can't get %s VSCREENINFO, reason: %s\n",
+			fbdev_fn,strerror(errno));
 	}
 	fbdev_mem = (uint8_t *)mmap(NULL,fbdev_finfo.smem_len,
 				    PROT_READ | PROT_WRITE, MAP_SHARED,
