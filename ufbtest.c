@@ -88,7 +88,7 @@ void fbdev_fill(useconds_t delay, unsigned long long count) {
 	return;
 }
 
-void fbdev_draw_pixel(uint x, uint y, uint32_t color) {
+void fbdev_draw_pixel(unsigned int x, unsigned int y, uint32_t color) {
 	int pos = y * fbdev_finfo.line_length +
 		x * sizeof(fbdev_vinfo.bits_per_pixel);
 	uint8_t *fbp8 = (uint8_t *)fbdev_mem + pos;
@@ -111,10 +111,10 @@ void fbdev_draw_pixel(uint x, uint y, uint32_t color) {
 	return;
 }
 
-void fbdev_draw_rect(uint pos_x, uint pos_y,
-		     uint rect_h, uint rect_w,
+void fbdev_draw_rect(unsigned int pos_x, unsigned int pos_y,
+		     unsigned int rect_h, unsigned int rect_w,
 		     uint32_t color) {
-	uint i;
+	unsigned int i;
 
 	// up
 	for (i=pos_x;i<=pos_x+rect_w;i++) {
@@ -138,8 +138,8 @@ void fbdev_draw_rect(uint pos_x, uint pos_y,
 void fbdev_fill_random_pixel(useconds_t delay, unsigned long long count,
 			     uint32_t color) {
 	srand(time(NULL));
-	uint x;
-	uint y;
+	unsigned int x;
+	unsigned int y;
 	while(count--) {
 		x = rand() % fbdev_vinfo.xres;
 		y = rand() % fbdev_vinfo.yres;
@@ -151,10 +151,10 @@ void fbdev_fill_random_pixel(useconds_t delay, unsigned long long count,
 
 void fbdev_fill_random_rect(useconds_t delay, unsigned long long count,
 			    uint32_t color) {
-	uint x;
-	uint y;
-	uint w;
-	uint h;
+	unsigned int x;
+	unsigned int y;
+	unsigned int w;
+	unsigned int h;
 	srand(time(NULL));
 	while(count--) {
 		x = rand() % fbdev_vinfo.xres;
