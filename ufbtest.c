@@ -26,27 +26,27 @@ int fbdev_init(void)
 	if (fbdev_fd == -1) {
 		fprintf(stderr,
 			"can't open %s , reason: %s\n",
-			fbdev_fn,strerror(errno));
+			fbdev_fn, strerror(errno));
 		return -1;
 	}
 	if (ioctl(fbdev_fd, FBIOGET_FSCREENINFO, &fbdev_finfo) == -1) {
 		fprintf(stderr,
 			"can't get %s FSCREENINFO, reason: %s\n",
-			fbdev_fn,strerror(errno));
+			fbdev_fn, strerror(errno));
 		return -1;
 	}
 	if (ioctl(fbdev_fd, FBIOGET_VSCREENINFO, &fbdev_vinfo) == -1) {
 		fprintf(stderr,
 			"can't get %s VSCREENINFO, reason: %s\n",
-			fbdev_fn,strerror(errno));
+			fbdev_fn, strerror(errno));
 	}
-	fbdev_mem = (uint8_t *)mmap(NULL,fbdev_finfo.smem_len,
-				    PROT_READ | PROT_WRITE, MAP_SHARED,
-				    fbdev_fd,0);
+	fbdev_mem = (uint8_t *) mmap(NULL, fbdev_finfo.smem_len,
+				     PROT_READ | PROT_WRITE, MAP_SHARED,
+				     fbdev_fd, 0);
 	if ((void *)fbdev_mem == (void *)-1) {
 		fprintf(stderr,
 			"can't mmap %s, reason: %s\n",
-			fbdev_fn,strerror(errno));
+			fbdev_fn, strerror(errno));
 		return -1;
 	}
 
@@ -55,13 +55,14 @@ int fbdev_init(void)
 
 #define fbdev_blank() memset(fbdev_mem, 0, fbdev_finfo.smem_len);
 
-void fbdev_draw_pixel(unsigned int x, unsigned int y, uint32_t color) {
+void fbdev_draw_pixel(unsigned int x, unsigned int y, uint32_t color)
+{
 	int pos = y * fbdev_finfo.line_length +
-		x * sizeof(fbdev_vinfo.bits_per_pixel);
-	uint8_t *fbp8 = (uint8_t *)fbdev_mem + pos;
-	uint16_t *fbp16 = (uint16_t *)fbp8;
-	uint32_t *fbp32 = (uint32_t *)fbp8;
-	switch(fbdev_vinfo.bits_per_pixel) {
+	    x * sizeof(fbdev_vinfo.bits_per_pixel);
+	uint8_t *fbp8 = (uint8_t *) fbdev_mem + pos;
+	uint16_t *fbp16 = (uint16_t *) fbp8;
+	uint32_t *fbp32 = (uint32_t *) fbp8;
+	switch (fbdev_vinfo.bits_per_pixel) {
 	case 32:
 		*fbp32 = color;
 		break;
@@ -79,116 +80,119 @@ void fbdev_draw_pixel(unsigned int x, unsigned int y, uint32_t color) {
 }
 
 void fbdev_draw_rect(unsigned int pos_x, unsigned int pos_y,
-		     unsigned int rect_h, unsigned int rect_w,
-		     uint32_t color) {
+		     unsigned int rect_h, unsigned int rect_w, uint32_t color)
+{
 	unsigned int i;
 
 	// up
-	for (i=pos_x;i<=pos_x+rect_w;i++) {
-		fbdev_draw_pixel(i,pos_y,color);
+	for (i = pos_x; i <= pos_x + rect_w; i++) {
+		fbdev_draw_pixel(i, pos_y, color);
 	}
 	// down
-	for (i=pos_x;i<=pos_x+rect_w;i++) {
-		fbdev_draw_pixel(i,pos_y+rect_h,color);
+	for (i = pos_x; i <= pos_x + rect_w; i++) {
+		fbdev_draw_pixel(i, pos_y + rect_h, color);
 	}
 	// left
-	for (i=pos_y;i<=pos_y+rect_h;i++) {
-		fbdev_draw_pixel(pos_x,i,color);
+	for (i = pos_y; i <= pos_y + rect_h; i++) {
+		fbdev_draw_pixel(pos_x, i, color);
 	}
 	// right
-	for (i=pos_y;i<=pos_y+rect_h;i++) {
-		fbdev_draw_pixel(pos_x+rect_w,i,color);
+	for (i = pos_y; i <= pos_y + rect_h; i++) {
+		fbdev_draw_pixel(pos_x + rect_w, i, color);
 	}
 	return;
 }
 
 void fbdev_draw_rect_solid(unsigned int pos_x, unsigned int pos_y,
-                     unsigned int rect_h, unsigned int rect_w,
-                     uint32_t color) {
-	unsigned int x,y;
-	for (y=pos_y;y<=(pos_y+rect_h);y++) {
-		for (x=pos_x;x<=(pos_x+rect_w);x++) {
-			fbdev_draw_pixel(x,y,color);
+			   unsigned int rect_h, unsigned int rect_w,
+			   uint32_t color)
+{
+	unsigned int x, y;
+	for (y = pos_y; y <= (pos_y + rect_h); y++) {
+		for (x = pos_x; x <= (pos_x + rect_w); x++) {
+			fbdev_draw_pixel(x, y, color);
 		}
 	}
 	return;
 }
 
 void fbdev_fill_random_pixel(useconds_t delay, unsigned long long count,
-			     uint32_t *color) {
+			     uint32_t * color)
+{
 	srand(time(NULL));
 	unsigned int x;
 	unsigned int y;
-        uint32_t random_color;
-        if (color == NULL)
-                color = &random_color;
-	while(count--) {
+	uint32_t random_color;
+	if (color == NULL)
+		color = &random_color;
+	while (count--) {
 		random_color = rand();
 		x = rand() % fbdev_vinfo.xres;
 		y = rand() % fbdev_vinfo.yres;
-		fbdev_draw_pixel(x,y,*color);
+		fbdev_draw_pixel(x, y, *color);
 		usleep(delay);
 	}
 	return;
 }
 
 void fbdev_fill_random_rect(useconds_t delay, unsigned long long count,
-			    uint32_t *color) {
+			    uint32_t * color)
+{
 	unsigned int x;
 	unsigned int y;
 	unsigned int w;
 	unsigned int h;
 	srand(time(NULL));
-        uint32_t random_color;
-        if (color == NULL)
-                color = &random_color;
-	while(count--) {
+	uint32_t random_color;
+	if (color == NULL)
+		color = &random_color;
+	while (count--) {
 		random_color = rand();
 		x = rand() % fbdev_vinfo.xres;
 		y = rand() % fbdev_vinfo.yres;
 		w = rand() % (fbdev_vinfo.xres - x);
 		h = rand() % (fbdev_vinfo.yres - y);
-		fbdev_draw_rect(x,y,h,w,*color);
+		fbdev_draw_rect(x, y, h, w, *color);
 		usleep(delay);
 	}
 	return;
 }
 
 void fbdev_fill_random_rect_solid(useconds_t delay, unsigned long long count,
-                            uint32_t *color) {
-        unsigned int x;
-        unsigned int y;
-        unsigned int w;
-        unsigned int h;
-        srand(time(NULL));
+				  uint32_t * color)
+{
+	unsigned int x;
+	unsigned int y;
+	unsigned int w;
+	unsigned int h;
+	srand(time(NULL));
 	uint32_t random_color;
 	if (color == NULL)
 		color = &random_color;
-        while(count--) {
+	while (count--) {
 		random_color = rand();
-                x = rand() % fbdev_vinfo.xres;
-                y = rand() % fbdev_vinfo.yres;
-                w = rand() % (fbdev_vinfo.xres - x);
-                h = rand() % (fbdev_vinfo.yres - y);
-                fbdev_draw_rect_solid(x,y,h,w,*color);
-                usleep(delay);
-        }
-        return;
+		x = rand() % fbdev_vinfo.xres;
+		y = rand() % fbdev_vinfo.yres;
+		w = rand() % (fbdev_vinfo.xres - x);
+		h = rand() % (fbdev_vinfo.yres - y);
+		fbdev_draw_rect_solid(x, y, h, w, *color);
+		usleep(delay);
+	}
+	return;
 }
 
-void fbdev_uninit(void) {
+void fbdev_uninit(void)
+{
 	if (fbdev_fd != -1)
 		close(fbdev_fd);
 	if ((void *)fbdev_mem != (void *)-1)
-		munmap(fbdev_mem,fbdev_finfo.smem_len);
+		munmap(fbdev_mem, fbdev_finfo.smem_len);
 }
 
 int main(int argc, char *argv[])
 {
 	if (argc < 4) {
-		fprintf(stderr,
-			"Usage: %s mode delay count [hex]\n",
-			argv[0]);
+		fprintf(stderr, "Usage: %s mode delay count [hex]\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 	if (fbdev_init() == -1)
@@ -196,20 +200,20 @@ int main(int argc, char *argv[])
 	fbdev_blank();
 
 	useconds_t delay = atoll(argv[2]);
-	unsigned long long count = strtoull(argv[3],NULL,10);
+	unsigned long long count = strtoull(argv[3], NULL, 10);
 	uint32_t *colorp = NULL;
 	uint32_t color;
 	if (argc >= 5) {
-		color = strtoll(argv[4],NULL,16);
+		color = strtoll(argv[4], NULL, 16);
 		colorp = &color;
 	}
 
-	if (strcmp(argv[1],"pixel") == 0) {
-		fbdev_fill_random_pixel(delay,count,colorp);
-	} else if (strcmp(argv[1],"rect") == 0) {
-		fbdev_fill_random_rect(delay,count,colorp);
-	} else if (strcmp(argv[1],"rect_solid") == 0) {
-		fbdev_fill_random_rect_solid(delay,count,colorp);
+	if (strcmp(argv[1], "pixel") == 0) {
+		fbdev_fill_random_pixel(delay, count, colorp);
+	} else if (strcmp(argv[1], "rect") == 0) {
+		fbdev_fill_random_rect(delay, count, colorp);
+	} else if (strcmp(argv[1], "rect_solid") == 0) {
+		fbdev_fill_random_rect_solid(delay, count, colorp);
 	}
 	fbdev_uninit();
 	return 0;
