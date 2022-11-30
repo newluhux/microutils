@@ -7,7 +7,10 @@ some micro tools written by LuHui <luhux76@gmail>
 
 - umemdump: process memory dump
 
+- memtest: memory test
+
 - ustardict: dictionary
+
 
 ** DEPEND
 
