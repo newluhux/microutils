@@ -32,6 +32,7 @@ install: all
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/umemtest
 
 clean:
+	rm -fv *.gch
 	rm -fv ufbtest
 	rm -fv umemdump
 	rm -fv ustardict

@@ -1,5 +1,6 @@
 *~
 *.out
+*.gch
 core
 ufbtest
 umemdump
