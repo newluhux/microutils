@@ -1,179 +1,195 @@
-#include <arpa/inet.h>
 #include <ctype.h>
-#include <errno.h>
 #include <fcntl.h>
-#include <limits.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
+#include <errno.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
 
-#define STARDICT_WORDLENMAX 255
-#define STARDICT_DEF "/usr/share/stardict/default"
+#include "stardict.h"
 
-static char dict_path[PATH_MAX];
+#define STARDICT_INDEX_DEFAULT "/usr/share/stardict/default.idx"
+#define STARDICT_DICT_DEFAULT "/usr/share/stardict/default.idx"
 
-static char idx_fn[PATH_MAX];
-static int idx_fd = -1;
-static size_t idx_size = 0;
-static uint8_t *idx_mmap = NULL;
+#define STARDICT_OUTPUT_HEADER "==============================================="
+#define STARDICT_OUTPUT_FOOTER "-----------------------------------------------"
 
-static char dict_fn[PATH_MAX];
-static int dict_fd = -1;
-
-static int stardict_init(void) {
-	char *temp = getenv("stardict");
-	if (temp == NULL)
-		temp = STARDICT_DEF;
-	snprintf(dict_path,PATH_MAX,"%s",temp);
-	snprintf(idx_fn,PATH_MAX,"%s.idx",dict_path);
-	snprintf(dict_fn,PATH_MAX,"%s.dict",dict_path);
-
-	idx_fd = open(idx_fn,O_RDONLY);
-	dict_fd = open(dict_fn,O_RDONLY);
-	if (idx_fd < 0 || dict_fd < 0)
-		return -1;
-
-	struct stat stbuf;
-	if (stat(idx_fn,&stbuf) == -1)
-		return -1;
-	idx_size = stbuf.st_size;
-
-	idx_mmap = mmap(NULL,idx_size,PROT_READ,MAP_SHARED,
-			idx_fd,0);
-	if (idx_mmap == NULL)
-		return -1;
-
-	return 1;
-}
-
-static int stardict_strcmp(char *s1, char *s2)
+unsigned long long stardict_wordcount(uint8_t * idxp, unsigned long size)
 {
-        int a;
-        a = strcasecmp(s1, s2);
-        if (a == 0)
-                return (strcmp(s1, s2));
-        else
-                return a;
-}
-
-static int stardict_search(char *word, off_t *offset, size_t *size) {
-	uint8_t *idxp = idx_mmap;
-	int found = 0;
-	
-	uint32_t *temp32;
-
-	while (idxp < (idx_mmap + idx_size)) {
-		if (stardict_strcmp(word, (char *)idxp) == 0) {
-			found = 1;
-		}
-		while (*idxp != '\0')
-			idxp++;
-		idxp++;
-
-		if (found == 1) {
-			temp32 = (uint32_t *)idxp;
-			*offset = (off_t)ntohl(*temp32);
-		}
-		idxp += sizeof(uint32_t);
-		
-		if (found == 1) {
-			temp32 = (uint32_t *)idxp;
-			*size = (size_t)ntohl(*temp32);
-			return found;
-		}
-		idxp += sizeof(uint32_t);
+	uint8_t *stardict_idx_end = idxp + size;
+	uint8_t *new_idxp = NULL;
+	unsigned long long wordcount = 0;
+	while (idxp < stardict_idx_end) {
+		wordcount++;
+		new_idxp = stardict_index_next(idxp, stardict_idx_end - idxp);
+		if (new_idxp == NULL)
+			break;
+		idxp = new_idxp;
 	}
-	return found;
+	return wordcount;
 }
 
-static int stardict_data_dump(off_t offset, size_t size) {
-	uint8_t buf[BUFSIZ];
-	ssize_t nr;
-	size_t readed = 0;
-	if (lseek(dict_fd,offset,SEEK_SET) != offset) {
+int stardict_strcmp(char *s1, char *s2)
+{
+	int r;
+	r = strcasecmp(s1, s2);
+	if (r == 0)
+		return (strcmp(s1, s2));
+	else
+		return r;
+}
+
+uint8_t *stardict_word_search(uint8_t * idxp, unsigned long size, char *word)
+{
+	uint8_t *stardict_idx_end = idxp + size;
+	uint8_t *new_idxp = NULL;
+	while (idxp < stardict_idx_end) {
+		if (stardict_strcmp(word, (char *)idxp) == 0)
+			return idxp;
+		new_idxp = stardict_index_next(idxp, stardict_idx_end - idxp);
+		if (new_idxp == NULL)
+			break;
+		idxp = new_idxp;
+	}
+	return NULL;
+}
+
+int stardict_dump_dict(uint8_t * dictp, unsigned long dict_size,
+		       unsigned long offset, unsigned long size, FILE * out)
+{
+	if ((dictp + offset + size) > (dictp + dict_size))
+		return -EINVAL;
+	return fwrite(dictp + offset, 1, size, out);
+}
+
+int stardict_print(char *word,
+		   uint8_t * idxp, unsigned long idxsize,
+		   uint8_t * dictp, unsigned long dictsize, FILE * out)
+{
+	stardict_offset dict_data_offset;
+	stardict_size dict_data_size;
+	printf("%s\n", STARDICT_OUTPUT_HEADER);
+	idxp = stardict_word_search(idxp, idxsize, word);
+	if (idxp == NULL) {
+		printf("NOTFOUND %s\n", word);
+		printf("\n%s\n", STARDICT_OUTPUT_FOOTER);
 		return -1;
 	}
-	while ((nr = read(dict_fd,buf,BUFSIZ)) > 0) {
-		if ((readed + nr) > size)
-			nr = size - readed;
-		if (write(STDOUT_FILENO,buf,nr) != nr) {
-			return -1;
-		}
-		readed += nr;
-		if (readed == size)
+	idxp += strlen((char *)idxp) + 1;
+	dict_data_offset = ntohl(*((stardict_offset *) idxp));
+	idxp += sizeof(stardict_offset);
+	dict_data_size = ntohl(*((stardict_size *) idxp));
+	printf("FOUND %s DATAOFFSET 0x%x DATASIZE: 0x%x\n",
+	       word, dict_data_offset, dict_data_size);
+	stardict_dump_dict(dictp, dictsize,
+			   dict_data_offset, dict_data_size, out);
+	printf("\n%s\n", STARDICT_OUTPUT_FOOTER);
+	return 0;
+}
+
+int getword(char *word, unsigned long size, FILE * in)
+{
+	int c;
+	// skip space 
+	while (1) {
+		c = getc(in);
+		if (c == EOF)
+			exit(EXIT_SUCCESS);
+		if (!isspace(c))
 			break;
 	}
+	ungetc(c, in);
+
+	// copy input to word
+	unsigned long i = 0;
+	for (; i < (size - 1); i++) {
+		c = getc(in);
+		if (c == EOF)
+			exit(EXIT_SUCCESS);
+		if (isspace(c))
+			break;
+		word[i] = c;
+	}
+	word[i] = '\0';
 	return 1;
 }
 
-static int search_and_print(char *word) {
-	off_t offset;
-	size_t size;
-	int ret;
-	
-	if (stardict_search(word,&offset,&size) != 1) {
-		fprintf(stderr,"NO RESULT FOR '%s'\n",word);
-		ret = -1;
-	} else {
-		printf("RESULT FOR '%s': \n",word);
-		ret = 1;
+int main(int argc, char *argv[])
+{
+	char *stardict_idxfn = getenv("STARDICT_INDEX");
+	if (stardict_idxfn == NULL)
+		stardict_idxfn = STARDICT_INDEX_DEFAULT;
+	int stardict_idxfd = open(stardict_idxfn, O_RDONLY);
+	if (stardict_idxfd < 0) {
+		fprintf(stderr, "can't open index file %s,REASON: %s\n",
+			stardict_idxfn, strerror(errno));
+		exit(EXIT_FAILURE);
 	}
-	printf("\n");
-	if (ret == 1) {
-		fflush(stdout);
-		stardict_data_dump(offset,size);
-		ret = 1;
+	struct stat stbuf;
+	if (stat(stardict_idxfn, &stbuf) < 0) {
+		fprintf(stderr, "can't get index file size %s,REASON: %s\n",
+			stardict_idxfn, strerror(errno));
+		exit(EXIT_FAILURE);
 	}
-	printf("\n---------------------------\n");
-	return ret;
-}
-
-static int getword(char *s, int size, FILE *in) {
-	char c;
-	s[0] = '\0';
-	// skip space before word
-	while ((c = fgetc(in)) != EOF && isspace(c));
-	if (c == EOF) return c;
-	ungetc(c,in);
-
-	int i = 0;
-	while(((c=fgetc(in)) != EOF)) {
-		if (isspace(c)) break;
-		if (i == size-1) break;
-		s[i++] = c;
-	}
-	s[i] = '\0';
-	return s[0];
-}
-
-int main(int argc, char *argv[]) {
-	if (stardict_init() == -1) {
-		fprintf(stderr,"ustardict can't init\n");
+	unsigned long stardict_idxsize = stbuf.st_size;
+	uint8_t *stardict_idxmem = mmap(NULL, stardict_idxsize,
+					PROT_READ, MAP_SHARED,
+					stardict_idxfd, 0);
+	if (stardict_idxmem == MAP_FAILED) {
+		fprintf(stderr, "can't mmap index file %s,REASON: %s\n",
+			stardict_idxfn, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
-	char word[STARDICT_WORDLENMAX];
-	int i;
+	char *stardict_dictfn = getenv("STARDICT_DICT");
+	if (stardict_dictfn == NULL)
+		stardict_dictfn = STARDICT_DICT_DEFAULT;
+	int stardict_dictfd = open(stardict_dictfn, O_RDONLY);
+	if (stardict_dictfd < 0) {
+		fprintf(stderr, "can't open dict file %s,REASON: %s\n",
+			stardict_dictfn, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+	if (stat(stardict_dictfn, &stbuf) < 0) {
+		fprintf(stderr, "can't get dict file size %s,REASON: %s\n",
+			stardict_dictfn, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+	unsigned long stardict_dictsize = stbuf.st_size;
+	uint8_t *stardict_dictmem = mmap(NULL, stardict_dictsize,
+					 PROT_READ, MAP_SHARED,
+					 stardict_dictfd, 0);
+	if (stardict_dictmem == MAP_FAILED) {
+		fprintf(stderr, "can't mmap dict file %s,REASON: %s\n",
+			stardict_dictfn, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
 
-	int hitcount = 0;
-	
-	if (argc == 1) {
-		while(getword(word,STARDICT_WORDLENMAX,stdin) != EOF) {
-			if (search_and_print(word) == 1) {
-				hitcount++;
-			}
-		}
-	} else {
-		for (i=1;i<argc;i++) {
-			if (search_and_print(argv[i]) == 1) {
-				hitcount++;
+	int i;
+	// detect options
+	for (i = 0; i < argc; i++) {
+		if (argv[i][0] == '-') {
+			if (strcmp(argv[i], "-wc") == 0) {
+				unsigned long long wordcount;
+				wordcount = stardict_wordcount(stardict_idxmem,
+							       stardict_idxsize);
+				printf("%llu\n", wordcount);
+				exit(EXIT_FAILURE);
 			}
 		}
 	}
 
-	return hitcount;
+	char word[STARDICT_WORDLEN_MAX];
+	while (argc == 1) {
+		getword(word, STARDICT_WORDLEN_MAX, stdin);
+		stardict_print(word, stardict_idxmem, stardict_idxsize,
+			       stardict_dictmem, stardict_dictsize, stdout);
+	}
+
+	for (i = 1; i < argc; i++) {
+		stardict_print(argv[i], stardict_idxmem, stardict_idxsize,
+			       stardict_dictmem, stardict_dictsize, stdout);
+	}
+	exit(EXIT_SUCCESS);
 }
