@@ -2,7 +2,7 @@ CFLAGS += -Wall -Wextra
 
 PREFIX ?= /usr/local
 
-all: ufbtest umemdump ustardict umemtest
+all: ufbtest umemdump ustardict umemtest utermhello
 
 ufbtest:
 	$(CC) $(CFLAGS) ufbtest.c -o ufbtest
@@ -15,6 +15,9 @@ ustardict:
 
 umemtest:
 	$(CC) $(CFLAGS) umemtest.c -o umemtest
+
+utermhello:
+	$(CC) $(CFLAGS) utermhello.c -o utermhello
 
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
@@ -31,9 +34,13 @@ install: all
 	cp -f umemtest $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/umemtest
 
+	cp -f utermhello $(DESTDIR)$(PREFIX)/bin/
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/utermhello
+
 clean:
 	rm -fv *.gch
 	rm -fv ufbtest
 	rm -fv umemdump
 	rm -fv ustardict
 	rm -fv umemtest
+	rm -fv utermhello
