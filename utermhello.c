@@ -34,6 +34,8 @@ void signal_handle(int signum)
 
 int main(int argc, char *argv[])
 {
+	(void) argc;
+	(void) argv;
 	ttyfd = open(ttyfn, O_RDWR);
 	if (ttyfd < 0) {
 		fprintf(stderr, "can't open tty %s,REASON: %s\n",
