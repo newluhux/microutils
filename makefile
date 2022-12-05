@@ -1,5 +1,4 @@
 CFLAGS += -Wall -Wextra
-CFLAGS += -static
 
 PREFIX ?= /usr/local
 
