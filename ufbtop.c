@@ -24,11 +24,11 @@ unsigned char default_font_w = 8;
 unsigned char default_font_h = 8;
 
 int draw_string(unsigned int x, unsigned int y,
-                        uint32_t colorfg, uint32_t colorbg,
-                        char *s,
-                        struct framebuffer_info *fb) {
+		uint32_t colorfg, uint32_t colorbg,
+		char *s, struct framebuffer_info *fb)
+{
 	struct bitmap bm;
-	memset(&bm,0,sizeof(bm));
+	memset(&bm, 0, sizeof(bm));
 	bm.w = default_font_w;
 	bm.h = default_font_h;
 	while (*s) {
@@ -41,10 +41,10 @@ int draw_string(unsigned int x, unsigned int y,
 }
 
 int draw_progress_bar(unsigned int x, unsigned int y,
-			unsigned int w, unsigned int h,
-			uint32_t colorfg, uint32_t colorbg,
-			unsigned short progress,
-			struct framebuffer_info *fb) {
+		      unsigned int w, unsigned int h,
+		      uint32_t colorfg, uint32_t colorbg,
+		      unsigned short progress, struct framebuffer_info *fb)
+{
 	framebuffer_draw_rect(x, y, w, h, colorfg, fb);
 	unsigned int pw = w;
 	pw -= x;
@@ -54,49 +54,50 @@ int draw_progress_bar(unsigned int x, unsigned int y,
 	}
 	if (progress >= 100)
 		pw = w;
-	framebuffer_draw_rect_solid(x+1, y+1, pw-2, h-2, colorfg, fb);
-	framebuffer_draw_rect_solid(x+pw+1, y+1, w-pw-2, h-2, colorbg, fb);
+	framebuffer_draw_rect_solid(x + 1, y + 1, pw - 2, h - 2, colorfg, fb);
+	framebuffer_draw_rect_solid(x + pw + 1, y + 1, w - pw - 2, h - 2,
+				    colorbg, fb);
 	return 0;
 }
 
-
-void get_hostname(char *s, unsigned long size) {
+void get_hostname(char *s, unsigned long size)
+{
 	static int fd = -1;
 	if (fd < 0)
-		fd = open("/proc/sys/kernel/hostname",O_RDONLY);
+		fd = open("/proc/sys/kernel/hostname", O_RDONLY);
 	char hostname[64];
-	memset(hostname,' ',64);
+	memset(hostname, ' ', 64);
 	if (pread(fd, hostname, 64, 0) < 0)
 		hostname[0] = '\0';
 	hostname[63] = '\0';
-	snprintf(s, size, "HOST:   %s",hostname);
+	snprintf(s, size, "HOST:   %s", hostname);
 }
 
-void get_uptime(char *s, unsigned long size) {
+void get_uptime(char *s, unsigned long size)
+{
 	struct sysinfo info;
 	sysinfo(&info);
 	unsigned long days, hours, mins;
-	days = info.uptime /(24*60*60);
+	days = info.uptime / (24 * 60 * 60);
 	mins = info.uptime / 60;
 	hours = (mins / 60) % 24;
 	mins %= 60;
 	snprintf(s, size, "UPTIME: %2lu DAYS %2lu HOURS %2lu MINS",
-			days,hours,mins);
+		 days, hours, mins);
 }
 
-unsigned short get_mem_usage(void) {
+unsigned short get_mem_usage(void)
+{
 	static FILE *fp = NULL;
 	if (fp == NULL)
-		fp = fopen("/proc/meminfo","r");
+		fp = fopen("/proc/meminfo", "r");
 	rewind(fp);
 	char line[64];
 
 	unsigned long available, total, used;
 	while (fgets(line, 64, fp) != NULL) {
-		sscanf(line, "MemAvailable: %lu %*s\n",
-			&available);
-		sscanf(line, "MemTotal: %lu %*s\n",
-			&total);
+		sscanf(line, "MemAvailable: %lu %*s\n", &available);
+		sscanf(line, "MemTotal: %lu %*s\n", &total);
 	}
 	used = total - available;
 	float fu, ft;
@@ -104,7 +105,6 @@ unsigned short get_mem_usage(void) {
 	ft = (float)total;
 	return (unsigned short)(fu / ft * 100);
 }
-
 
 int main(int argc, char *argv[])
 {
@@ -171,30 +171,30 @@ int main(int argc, char *argv[])
 	unsigned int mem_str_x = 10;
 	unsigned int mem_str_y = 40;
 	unsigned int mem_progress = 0;
-	unsigned int mem_progress_x = mem_str_x + strlen(mem_str) * 
-						default_font_w;
+	unsigned int mem_progress_x = mem_str_x + strlen(mem_str) *
+	    default_font_w;
 	unsigned int mem_progress_y = mem_str_y;
 
 	// fill bg
-	framebuffer_draw_rect_solid(0,0,fb.xres,fb.yres,bg,&fb);
+	framebuffer_draw_rect_solid(0, 0, fb.xres, fb.yres, bg, &fb);
 	while (1) {
 		// get hostname
 		get_hostname(hostname_str, 128);
 		// draw hostname
 		draw_string(hostname_str_x, hostname_str_y, fg, bg,
-				hostname_str, &fb);
+			    hostname_str, &fb);
 		// get uptime
 		get_uptime(uptime_str, 128);
 		// draw uptime
 		draw_string(uptime_str_x, uptime_str_y, fg, bg,
-                                uptime_str, &fb);
+			    uptime_str, &fb);
 		// get mem usage
 		mem_progress = get_mem_usage();
 		// draw mem usage
-                draw_string(mem_str_x,mem_str_y, fg, bg, mem_str, &fb);
-                draw_progress_bar(mem_progress_x,mem_progress_y,
-                                fb.xres - mem_progress_x - 10, 8,
-                                fg, bg, mem_progress, &fb);
+		draw_string(mem_str_x, mem_str_y, fg, bg, mem_str, &fb);
+		draw_progress_bar(mem_progress_x, mem_progress_y,
+				  fb.xres - mem_progress_x - 10, 8,
+				  fg, bg, mem_progress, &fb);
 		// sleep some time
 		if (delay > 0)
 			usleep(delay);
