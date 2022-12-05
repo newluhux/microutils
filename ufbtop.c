@@ -80,7 +80,7 @@ void get_uptime(char *s, unsigned long size) {
 	mins = info.uptime / 60;
 	hours = (mins / 60) % 24;
 	mins %= 60;
-	snprintf(s, size, "UPTIME: %2lu DAYS %2lu HOURS :%2lu MINS",
+	snprintf(s, size, "UPTIME: %2lu DAYS %2lu HOURS %2lu MINS",
 			days,hours,mins);
 }
 
