@@ -13,6 +13,8 @@ some micro tools written by LuHui <luhux76@gmail>
 
 - utermhello: a curses-like hello world program, but not depend curses
 
+- ufbtop: display system info on framebuffer
+
 ** DEPEND
 
 libc
