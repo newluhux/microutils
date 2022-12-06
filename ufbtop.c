@@ -145,6 +145,28 @@ unsigned short get_mem_usage(void)
 	return (unsigned short)(fu / ft * 100);
 }
 
+unsigned short get_swap_usage(void)
+{
+	        static FILE *fp = NULL;
+        if (fp == NULL)
+                fp = fopen("/proc/meminfo", "r");
+        rewind(fp);
+        char line[64];
+
+        unsigned long total, free, used;
+        while (fgets(line, 64, fp) != NULL) {
+                sscanf(line, "SwapTotal: %lu %*s\n", &total);
+                sscanf(line, "SwapFree: %lu %*s\n", &free);
+        }
+	used = total - free;
+	if (total == 0 || used == 0)
+		return 0;
+        float fu, ft;
+        ft = (float)total;
+        fu = (float)used;
+        return (unsigned short)(fu / ft * 100);
+}
+
 int main(int argc, char *argv[])
 {
 	char *fbdev_pathname = getenv("FRAMEBUFFER");
@@ -222,6 +244,15 @@ int main(int argc, char *argv[])
 	    default_font_w;
 	unsigned int mem_progress_y = mem_str_y;
 
+	char *swap_str = "SWAP:   ";
+        unsigned int swap_str_x = 10;
+        unsigned int swap_str_y = 60;
+        unsigned int swap_progress = 0;
+        unsigned int swap_progress_x = swap_str_x + strlen(swap_str) *
+            default_font_w;
+        unsigned int swap_progress_y = swap_str_y;
+
+
 	// fill bg
 	framebuffer_draw_rect_solid(0, 0, fb.xres, fb.yres, bg, &fb);
 	while (1) {
@@ -249,6 +280,14 @@ int main(int argc, char *argv[])
 		draw_progress_bar(mem_progress_x, mem_progress_y,
 				  fb.xres - mem_progress_x - 10, 8,
 				  fg, bg, mem_progress, &fb);
+
+		// get swap usage
+		swap_progress = get_swap_usage();
+                // draw swap usage
+                draw_string(swap_str_x, swap_str_y, fg, bg, swap_str, &fb);
+                draw_progress_bar(swap_progress_x, swap_progress_y,
+                                  fb.xres - swap_progress_x - 10, 8,
+                                  fg, bg, swap_progress, &fb);
 		// sleep some time
 		if (delay > 0)
 			usleep(delay);
