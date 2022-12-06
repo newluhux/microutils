@@ -86,6 +86,44 @@ void get_uptime(char *s, unsigned long size)
 		 days, hours, mins);
 }
 
+unsigned short get_cpu_usage(void)
+{
+	static int fd = -1;
+	if (fd == -1)
+		fd = open("/proc/stat", O_RDONLY);
+	char buf[128];
+	memset(buf, 0, 128);
+	pread(fd, buf, 128, 0);
+	strtok(buf, " ");
+	unsigned long user_now = atol(strtok(NULL, " "));
+	unsigned long nice_now = atol(strtok(NULL, " "));
+	unsigned long system_now = atol(strtok(NULL, " "));
+	unsigned long idle_now = atol(strtok(NULL, " "));
+	unsigned long iowait_now = atol(strtok(NULL, " "));
+	unsigned long irq_now = atoll(strtok(NULL, " "));
+	unsigned long softirq_now = atol(strtok(NULL, " "));
+	unsigned long steal_now = atol(strtok(NULL, " "));
+	unsigned long guest_now = atol(strtok(NULL, " "));
+	unsigned long guest_nice_now = atol(strtok(NULL, " "));
+	unsigned long total_now = user_now + nice_now + system_now +
+	    idle_now + iowait_now + irq_now + softirq_now +
+	    steal_now + guest_now + guest_nice_now;
+	unsigned long used_now = user_now + nice_now + system_now +
+	    irq_now + softirq_now + guest_now + guest_nice_now;
+	static unsigned long used_old = 0;
+	static unsigned long total_old = 0;
+	if (used_old == 0 && total_old == 0) {
+		used_old = used_now;
+		total_old = total_now;
+		return 0;
+	}
+	float used = (float)(used_now - used_old);
+	float total = (float)(total_now - total_old);
+	used_old = used_now;
+	total_old = total_now;
+	return (unsigned short)(used / total * 100.0);
+}
+
 unsigned short get_mem_usage(void)
 {
 	static FILE *fp = NULL;
@@ -153,7 +191,7 @@ int main(int argc, char *argv[])
 			fbdev_pathname, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
-	useconds_t delay = 10000;
+	useconds_t delay = 100000;
 	if (argc > 1)
 		delay = atol(argv[1]);
 	uint32_t bg = 0xFFFFFFFF;
@@ -167,9 +205,17 @@ int main(int argc, char *argv[])
 	unsigned int uptime_str_x = 10;
 	unsigned int uptime_str_y = 30;
 
+	char *cpu_str = "CPU:    ";
+	unsigned int cpu_str_x = 10;
+	unsigned int cpu_str_y = 40;
+	unsigned int cpu_progress = 0;
+	unsigned int cpu_progress_x = cpu_str_x + strlen(cpu_str) *
+	    default_font_w;
+	unsigned int cpu_progress_y = cpu_str_y;
+
 	char *mem_str = "MEM:    ";
 	unsigned int mem_str_x = 10;
-	unsigned int mem_str_y = 40;
+	unsigned int mem_str_y = 50;
 	unsigned int mem_progress = 0;
 	unsigned int mem_progress_x = mem_str_x + strlen(mem_str) *
 	    default_font_w;
@@ -188,6 +234,13 @@ int main(int argc, char *argv[])
 		// draw uptime
 		draw_string(uptime_str_x, uptime_str_y, fg, bg,
 			    uptime_str, &fb);
+		// get cpu usage
+		cpu_progress = get_cpu_usage();
+		// draw cpu usage
+		draw_string(cpu_str_x, cpu_str_y, fg, bg, cpu_str, &fb);
+		draw_progress_bar(cpu_progress_x, cpu_progress_y,
+				  fb.xres - cpu_progress_x - 10, 8,
+				  fg, bg, cpu_progress, &fb);
 		// get mem usage
 		mem_progress = get_mem_usage();
 		// draw mem usage
