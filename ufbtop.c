@@ -46,14 +46,15 @@ int draw_progress_bar(unsigned int x, unsigned int y,
 		      unsigned short progress, struct framebuffer_info *fb)
 {
 	framebuffer_draw_rect(x, y, w, h, colorfg, fb);
-	unsigned int pw = w;
-	pw -= x;
-	if (pw > 0) {
-		pw /= 100;
-		pw *= progress;
+	float fw = w;
+	fw -= (float)x;
+	if (fw > 0) {
+		fw /= (float)100;
+		fw *= (float)progress;
 	}
 	if (progress >= 100)
-		pw = w;
+		fw = w;
+	unsigned int pw = (unsigned int)fw;
 	framebuffer_draw_rect_solid(x + 1, y + 1, pw - 2, h - 2, colorfg, fb);
 	framebuffer_draw_rect_solid(x + pw + 1, y + 1, w - pw - 2, h - 2,
 				    colorbg, fb);
