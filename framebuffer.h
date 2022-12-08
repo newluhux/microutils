@@ -17,7 +17,7 @@ struct framebuffer_info {
 void framebuffer_draw_pixel(unsigned x, unsigned int y,
 			    uint32_t color, struct framebuffer_info *fb)
 {
-	if ((x > fb->xres) || (y > fb->yres))
+	if ((x >= fb->xres) || (y >= fb->yres))
 		return;
 	uint8_t *fbp8 = fb->mem;
 	int pos = y * fb->line_length + x * fb->bits_per_pixel / 8;
