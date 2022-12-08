@@ -61,6 +61,16 @@ int draw_progress_bar(unsigned int x, unsigned int y,
 	return 0;
 }
 
+void get_version(char *s, unsigned long size) {
+	static int fd = -1;
+	if (fd < 0)
+		fd = open("/proc/version", O_RDONLY);
+	char buf[256];
+	pread(fd, buf, 256, 0);
+	buf[255] = '\0';
+	snprintf(s,size,"VER:    %s",buf);
+}
+
 void get_hostname(char *s, unsigned long size)
 {
 	static int fd = -1;
@@ -220,17 +230,22 @@ int main(int argc, char *argv[])
 	uint32_t bg = 0xFFFFFFFF;
 	uint32_t fg = 0x0;
 
+	char version_str[256];
+	unsigned int version_str_x = 10;
+        unsigned int version_str_y = 20;
+
+
 	char hostname_str[128];
 	unsigned int hostname_str_x = 10;
-	unsigned int hostname_str_y = 20;
+	unsigned int hostname_str_y = 30;
 
 	char uptime_str[128];
 	unsigned int uptime_str_x = 10;
-	unsigned int uptime_str_y = 30;
+	unsigned int uptime_str_y = 40;
 
 	char *cpu_str = "CPU:    ";
 	unsigned int cpu_str_x = 10;
-	unsigned int cpu_str_y = 40;
+	unsigned int cpu_str_y = 50;
 	unsigned int cpu_progress = 0;
 	unsigned int cpu_progress_x = cpu_str_x + strlen(cpu_str) *
 	    default_font_w;
@@ -238,7 +253,7 @@ int main(int argc, char *argv[])
 
 	char *mem_str = "MEM:    ";
 	unsigned int mem_str_x = 10;
-	unsigned int mem_str_y = 50;
+	unsigned int mem_str_y = 60;
 	unsigned int mem_progress = 0;
 	unsigned int mem_progress_x = mem_str_x + strlen(mem_str) *
 	    default_font_w;
@@ -246,7 +261,7 @@ int main(int argc, char *argv[])
 
 	char *swap_str = "SWAP:   ";
         unsigned int swap_str_x = 10;
-        unsigned int swap_str_y = 60;
+        unsigned int swap_str_y = 70;
         unsigned int swap_progress = 0;
         unsigned int swap_progress_x = swap_str_x + strlen(swap_str) *
             default_font_w;
@@ -256,6 +271,10 @@ int main(int argc, char *argv[])
 	// fill bg
 	framebuffer_draw_rect_solid(0, 0, fb.xres, fb.yres, bg, &fb);
 	while (1) {
+		// get version
+		get_version(version_str, 256);
+		draw_string(version_str_x, version_str_y, fg, bg,
+                            version_str, &fb);
 		// get hostname
 		get_hostname(hostname_str, 128);
 		// draw hostname
