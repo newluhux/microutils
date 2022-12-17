@@ -26,7 +26,7 @@ urime2stardict:
 	$(CC) $(CFLAGS) urime2stardict.c -o urime2stardict
 
 ufbterm:
-        $(CC) $(CFLAGS) ufbterm.c -o ufbterm
+	$(CC) $(CFLAGS) ufbterm.c -o ufbterm
 
 
 install: all
@@ -53,8 +53,8 @@ install: all
 	cp -f urime2stardict $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/urime2stardict
 
-        cp -f ufbterm $(DESTDIR)$(PREFIX)/bin/
-        chmod 755 $(DESTDIR)$(PREFIX)/bin/ufbterm
+	cp -f ufbterm $(DESTDIR)$(PREFIX)/bin/
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/ufbterm
 
 
 clean:
