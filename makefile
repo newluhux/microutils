@@ -25,6 +25,10 @@ ufbtop:
 urime2stardict:
 	$(CC) $(CFLAGS) urime2stardict.c -o urime2stardict
 
+ufbterm:
+        $(CC) $(CFLAGS) ufbterm.c -o ufbterm
+
+
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 
@@ -49,6 +53,10 @@ install: all
 	cp -f urime2stardict $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/urime2stardict
 
+        cp -f ufbterm $(DESTDIR)$(PREFIX)/bin/
+        chmod 755 $(DESTDIR)$(PREFIX)/bin/ufbterm
+
+
 clean:
 	rm -fv *.gch
 	rm -fv ufbtest
@@ -58,3 +66,4 @@ clean:
 	rm -fv utermhello
 	rm -fv ufbtop
 	rm -fv urime2stardict
+	rm -fv ufbterm
