@@ -2,7 +2,8 @@ CFLAGS += -Wall -Wextra -static -O3
 
 PREFIX ?= /usr/local
 
-all: ufbtest umemdump ustardict umemtest utermhello ufbtop urime2stardict
+all: ufbtest umemdump ustardict umemtest utermhello ufbtop urime2stardict \
+	ufbterm
 
 ufbtest:
 	$(CC) $(CFLAGS) ufbtest.c -o ufbtest
