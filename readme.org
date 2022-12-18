@@ -21,6 +21,8 @@ some micro tools written by LuHui <luhux76@gmail>
 
 ** DEPEND
 
+linux-headers
+
 libc
 
 ** INSTALL
