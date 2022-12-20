@@ -14,7 +14,7 @@
 
 #include "font.h"
 #include "bitmap.h"
-#include "framebuffer.h"
+#include "fbdraw.h"
 
 #define FBDEV_DEFAULT "/dev/fb0"
 
@@ -25,7 +25,7 @@ unsigned char default_font_h = 8;
 
 int draw_string(unsigned int x, unsigned int y,
 		uint32_t colorfg, uint32_t colorbg,
-		char *s, struct framebuffer_info *fb)
+		char *s, struct fbdraw_info *fb)
 {
 	struct bitmap bm;
 	memset(&bm, 0, sizeof(bm));
@@ -33,7 +33,7 @@ int draw_string(unsigned int x, unsigned int y,
 	bm.h = default_font_h;
 	while (*s) {
 		bm.data = vga_font_8x8[(int)*s];
-		framebuffer_draw_bitmap(x, y, &bm, &colorfg, &colorbg, fb);
+		fbdraw_draw_bitmap(x, y, &bm, &colorfg, &colorbg, fb);
 		x += bm.w;
 		s++;
 	}
@@ -43,9 +43,9 @@ int draw_string(unsigned int x, unsigned int y,
 int draw_progress_bar(unsigned int x, unsigned int y,
 		      unsigned int w, unsigned int h,
 		      uint32_t colorfg, uint32_t colorbg,
-		      unsigned short progress, struct framebuffer_info *fb)
+		      unsigned short progress, struct fbdraw_info *fb)
 {
-	framebuffer_draw_rect(x, y, w, h, colorfg, fb);
+	fbdraw_draw_rect(x, y, w, h, colorfg, fb);
 	float fw = w;
 	fw -= (float)x;
 	if (fw > 0) {
@@ -55,8 +55,8 @@ int draw_progress_bar(unsigned int x, unsigned int y,
 	if (progress >= 100)
 		fw = w;
 	unsigned int pw = (unsigned int)fw;
-	framebuffer_draw_rect_solid(x + 1, y + 1, pw - 2, h - 2, colorfg, fb);
-	framebuffer_draw_rect_solid(x + pw + 1, y + 1, w - pw - 2, h - 2,
+	fbdraw_draw_rect_solid(x + 1, y + 1, pw - 2, h - 2, colorfg, fb);
+	fbdraw_draw_rect_solid(x + pw + 1, y + 1, w - pw - 2, h - 2,
 				    colorbg, fb);
 	return 0;
 }
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
 			fbdev_pathname, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
-	struct framebuffer_info fb;
+	struct fbdraw_info fb;
 	memset(&fb, 0, sizeof(fb));
 	struct fb_var_screeninfo fb_vinfo;
 	if (ioctl(fbdev_fd, FBIOGET_VSCREENINFO, &fb_vinfo) < 0) {
@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
 
 
 	// fill bg
-	framebuffer_draw_rect_solid(0, 0, fb.xres, fb.yres, bg, &fb);
+	fbdraw_draw_rect_solid(0, 0, fb.xres, fb.yres, bg, &fb);
 	while (1) {
 		// get version
 		get_version(version_str, 256);

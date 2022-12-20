@@ -1,11 +1,11 @@
-#ifndef _FRAMEBUFFER_H_
-#define _FRAMEBUFFER_H_
+#ifndef _FBDRAW_H_
+#define _FBDRAW_H_
 
 #include <errno.h>
 #include <stdint.h>
 #include "misc.h"
 
-struct framebuffer_info {
+struct fbdraw_info {
 	uint8_t *mem;
 	unsigned long size;
 	unsigned int xres;
@@ -14,8 +14,8 @@ struct framebuffer_info {
 	unsigned int line_length;
 };
 
-void framebuffer_draw_pixel(unsigned x, unsigned int y,
-			    uint32_t color, struct framebuffer_info *fb)
+void fbdraw_draw_pixel(unsigned x, unsigned int y,
+			    uint32_t color, struct fbdraw_info *fb)
 {
 	if ((x >= fb->xres) || (y >= fb->yres))
 		return;
@@ -37,61 +37,61 @@ void framebuffer_draw_pixel(unsigned x, unsigned int y,
 	}
 }
 
-void framebuffer_draw_xline(unsigned x0, unsigned x1, unsigned int y,
-			    uint32_t color, struct framebuffer_info *fb)
+void fbdraw_draw_xline(unsigned x0, unsigned x1, unsigned int y,
+			    uint32_t color, struct fbdraw_info *fb)
 {
 	unsigned int xmin = MIN(x0, x1);
 	unsigned int xmax = MAX(x0, x1);
 	for (; xmin <= xmax; xmin++)
-		framebuffer_draw_pixel(xmin, y, color, fb);
+		fbdraw_draw_pixel(xmin, y, color, fb);
 }
 
-void framebuffer_draw_yline(unsigned y0, unsigned y1, unsigned int x,
-			    uint32_t color, struct framebuffer_info *fb)
+void fbdraw_draw_yline(unsigned y0, unsigned y1, unsigned int x,
+			    uint32_t color, struct fbdraw_info *fb)
 {
 	unsigned int ymin = MIN(y0, y1);
 	unsigned int ymax = MAX(y0, y1);
 	for (; ymin <= ymax; ymin++)
-		framebuffer_draw_pixel(x, ymin, color, fb);
+		fbdraw_draw_pixel(x, ymin, color, fb);
 }
 
-void framebuffer_draw_rect(unsigned int x, unsigned int y,
+void fbdraw_draw_rect(unsigned int x, unsigned int y,
 			   unsigned int w, unsigned int h,
-			   uint32_t color, struct framebuffer_info *fb)
+			   uint32_t color, struct fbdraw_info *fb)
 {
 	// draw up
-	framebuffer_draw_xline(x, x + w, y, color, fb);
+	fbdraw_draw_xline(x, x + w, y, color, fb);
 	// draw down
-	framebuffer_draw_xline(x, x + w, y + h, color, fb);
+	fbdraw_draw_xline(x, x + w, y + h, color, fb);
 	// draw left
-	framebuffer_draw_yline(y, y + h, x, color, fb);
+	fbdraw_draw_yline(y, y + h, x, color, fb);
 	// draw right
-	framebuffer_draw_yline(y, y + h, x + w, color, fb);
+	fbdraw_draw_yline(y, y + h, x + w, color, fb);
 }
 
-void framebuffer_draw_rect_solid(unsigned int x, unsigned int y,
+void fbdraw_draw_rect_solid(unsigned int x, unsigned int y,
 				 unsigned int w, unsigned int h,
-				 uint32_t color, struct framebuffer_info *fb)
+				 uint32_t color, struct fbdraw_info *fb)
 {
 	unsigned int ycur;
 	for (ycur = y; ycur <= (y + h); ycur++)
-		framebuffer_draw_xline(x, x + w, ycur, color, fb);
+		fbdraw_draw_xline(x, x + w, ycur, color, fb);
 }
 
 #ifdef _BITMAP_H_
-void framebuffer_draw_bitmap(unsigned int x, unsigned int y,
+void fbdraw_draw_bitmap(unsigned int x, unsigned int y,
 			     struct bitmap *bm, uint32_t * colorfg,
-			     uint32_t * colorbg, struct framebuffer_info *fb)
+			     uint32_t * colorbg, struct fbdraw_info *fb)
 {
 	uint8_t *bmdata = bm->data;
 	unsigned int bx, by;
 	for (by = 0; by < bm->h; by++) {
 		for (bx = 0; bx < bm->w; bx++) {
 			if ((*(bmdata + by) & 1 << bx) && colorfg != NULL) {
-				framebuffer_draw_pixel(bx + x, by + y,
+				fbdraw_draw_pixel(bx + x, by + y,
 						       *colorfg, fb);
 			} else if (colorbg != NULL) {
-				framebuffer_draw_pixel(bx + x, by + y,
+				fbdraw_draw_pixel(bx + x, by + y,
 						       *colorbg, fb);
 			}
 		}

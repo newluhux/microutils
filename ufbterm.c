@@ -11,13 +11,13 @@
 #include "bitmap.h"
 #include "term.h"
 #include "font.h"
-#include "framebuffer.h"
+#include "fbdraw.h"
 
 #define FBDEV_DEFAULT "/dev/fb0"
 
 void draw_term(unsigned int x, unsigned int y,
 	       uint32_t colorfg, uint32_t colorbg,
-	       struct framebuffer_info *fb, struct term_info *term)
+	       struct fbdraw_info *fb, struct term_info *term)
 {
 	unsigned int tx, ty;
 	unsigned int fx, fy;
@@ -33,7 +33,7 @@ void draw_term(unsigned int x, unsigned int y,
 	for (ty = 0; ty < term->line_nums; ty++) {
 		for (tx = 0; tx < term->line_length; tx++) {
 			bm.data = vga_font_8x8[(int)*termp];
-			framebuffer_draw_bitmap(fx, fy, &bm,
+			fbdraw_draw_bitmap(fx, fy, &bm,
 						&colorfg, &colorbg, fb);
 			fx += bm.w;
 			termp++;
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 			fbdev_pathname, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
-	struct framebuffer_info fb;
+	struct fbdraw_info fb;
 	memset(&fb, 0, sizeof(fb));
 	struct fb_var_screeninfo fb_vinfo;
 	if (ioctl(fbdev_fd, FBIOGET_VSCREENINFO, &fb_vinfo) < 0) {

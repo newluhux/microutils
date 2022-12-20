@@ -13,7 +13,7 @@
 
 #include "font.h"
 #include "bitmap.h"
-#include "framebuffer.h"
+#include "fbdraw.h"
 
 #define FBDEV_DEFAULT "/dev/fb0"
 
@@ -24,19 +24,19 @@ void help(void)
 	fprintf(stderr, "usage: %s action delay\n",progname);
 }
 
-void do_fill(struct framebuffer_info *fb, useconds_t delay)
+void do_fill(struct fbdraw_info *fb, useconds_t delay)
 {
 	uint32_t color;
 	while (1) {
 		if (delay > 0)
 			usleep(delay);
 		color = rand();
-		framebuffer_draw_rect_solid(0, 0, fb->xres, fb->yres, color,
+		fbdraw_draw_rect_solid(0, 0, fb->xres, fb->yres, color,
 					    fb);
 	}
 }
 
-void do_pixel(struct framebuffer_info *fb, useconds_t delay)
+void do_pixel(struct fbdraw_info *fb, useconds_t delay)
 {
 	uint32_t color;
 	unsigned int x, y;
@@ -46,11 +46,11 @@ void do_pixel(struct framebuffer_info *fb, useconds_t delay)
 		color = rand();
 		x = rand() % fb->xres;
 		y = rand() % fb->yres;
-		framebuffer_draw_pixel(x, y, color, fb);
+		fbdraw_draw_pixel(x, y, color, fb);
 	}
 }
 
-void do_rect(struct framebuffer_info *fb, useconds_t delay)
+void do_rect(struct fbdraw_info *fb, useconds_t delay)
 {
 	uint32_t color;
 	unsigned int x, y, w, h;
@@ -62,11 +62,11 @@ void do_rect(struct framebuffer_info *fb, useconds_t delay)
 		y = rand() % fb->yres;
 		w = rand() % (fb->xres - x);
 		h = rand() % (fb->yres - y);
-		framebuffer_draw_rect_solid(x, y, w, h, color, fb);
+		fbdraw_draw_rect_solid(x, y, w, h, color, fb);
 	}
 }
 
-void do_line(struct framebuffer_info *fb, useconds_t delay)
+void do_line(struct fbdraw_info *fb, useconds_t delay)
 {
 	uint32_t color;
 	unsigned int x, y;
@@ -76,13 +76,13 @@ void do_line(struct framebuffer_info *fb, useconds_t delay)
 		color = rand();
 		x = rand() % fb->xres;
 		y = rand() % fb->yres;
-		framebuffer_draw_xline(0, fb->xres, y, color, fb);
-		framebuffer_draw_yline(0, fb->yres, x, color, fb);
+		fbdraw_draw_xline(0, fb->xres, y, color, fb);
+		fbdraw_draw_yline(0, fb->yres, x, color, fb);
 	}
 }
 #ifdef _BITMAP_H_
 #ifdef _FONT_H_
-void do_char(struct framebuffer_info *fb, useconds_t delay)
+void do_char(struct fbdraw_info *fb, useconds_t delay)
 {
 	uint32_t colorfg;
 	unsigned int x, y;
@@ -99,7 +99,7 @@ void do_char(struct framebuffer_info *fb, useconds_t delay)
                 y = rand() % fb->yres;
 		c = rand() % 128;
 		bm.data = vga_font_8x8[c];
-		framebuffer_draw_bitmap(x,y,&bm,&colorfg,NULL,fb);
+		fbdraw_draw_bitmap(x,y,&bm,&colorfg,NULL,fb);
 	}
 	return;
 }
@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 			fbdev_pathname, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
-	struct framebuffer_info fb;
+	struct fbdraw_info fb;
 	memset(&fb, 0, sizeof(fb));
 	struct fb_var_screeninfo fb_vinfo;
 	if (ioctl(fbdev_fd, FBIOGET_VSCREENINFO, &fb_vinfo) < 0) {
