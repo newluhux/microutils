@@ -65,9 +65,9 @@ void get_version(char *s, unsigned long size) {
 	static int fd = -1;
 	if (fd < 0)
 		fd = open("/proc/version", O_RDONLY);
-	char buf[256];
-	pread(fd, buf, 256, 0);
-	buf[255] = '\0';
+	char buf[200];
+	pread(fd, buf, 200, 0);
+	buf[199] = '\0';
 	snprintf(s,size,"VER:    %s",buf);
 }
 
