@@ -15,8 +15,6 @@ some micro tools written by LuHui <luhux76@gmail>
 
 - ufbtop: display system info on framebuffer
 
-- urime2stardict: convert rime.table.txt to stardict format
-
 - ufbterm: dumb terminal emulator on framebuffer
 
 ** DEPEND

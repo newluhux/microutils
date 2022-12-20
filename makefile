@@ -2,8 +2,7 @@ CFLAGS += -Wall -Wextra -static -O3
 
 PREFIX ?= /usr/local
 
-all: ufbtest umemdump ustardict umemtest utermhello ufbtop urime2stardict \
-	ufbterm
+all: ufbtest umemdump ustardict umemtest utermhello ufbtop ufbterm
 
 ufbtest:
 	$(CC) $(CFLAGS) ufbtest.c -o ufbtest
@@ -22,9 +21,6 @@ utermhello:
 
 ufbtop:
 	$(CC) $(CFLAGS) ufbtop.c -o ufbtop
-
-urime2stardict:
-	$(CC) $(CFLAGS) urime2stardict.c -o urime2stardict
 
 ufbterm:
 	$(CC) $(CFLAGS) ufbterm.c -o ufbterm
@@ -51,9 +47,6 @@ install: all
 	cp -f ufbtop $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/ufbtop
 
-	cp -f urime2stardict $(DESTDIR)$(PREFIX)/bin/
-	chmod 755 $(DESTDIR)$(PREFIX)/bin/urime2stardict
-
 	cp -f ufbterm $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/ufbterm
 
@@ -66,5 +59,4 @@ clean:
 	rm -fv umemtest
 	rm -fv utermhello
 	rm -fv ufbtop
-	rm -fv urime2stardict
 	rm -fv ufbterm
