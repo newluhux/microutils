@@ -30,6 +30,8 @@ void term_putc(char c, struct term_info *term)
 	if (c == '\n' || c == '\r') {
 		term->curp += term->line_length -
 		    ((term->curp - term->mem) % term->line_length);
+	} else if (c == '\t') {
+		term->curp += 8;
 	} else {
 		term->curp += 1;
 	}
