@@ -32,7 +32,7 @@ void draw_term(unsigned int x, unsigned int y,
 
 	for (ty = 0; ty < term->line_nums; ty++) {
 		for (tx = 0; tx < term->line_length; tx++) {
-			bm.data = vga_font_8x8[(int)*termp];
+			bm.data = vga_font_8x8[(uint8_t)*termp];
 			fbdraw_draw_bitmap(fx, fy, &bm,
 						&colorfg, &colorbg, fb);
 			fx += bm.w;

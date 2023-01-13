@@ -32,7 +32,7 @@ int draw_string(unsigned int x, unsigned int y,
 	bm.w = default_font_w;
 	bm.h = default_font_h;
 	while (*s) {
-		bm.data = vga_font_8x8[(int)*s];
+		bm.data = vga_font_8x8[(uint8_t)*s];
 		fbdraw_draw_bitmap(x, y, &bm, &colorfg, &colorbg, fb);
 		x += bm.w;
 		s++;
