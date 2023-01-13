@@ -1,7 +1,6 @@
 #ifndef _FBDRAW_H_
 #define _FBDRAW_H_
 
-#include <errno.h>
 #include <stdint.h>
 #include "misc.h"
 
@@ -78,7 +77,6 @@ inline void fbdraw_draw_rect_solid(unsigned int x, unsigned int y,
 		fbdraw_draw_xline(x, x + w, ycur, color, fb);
 }
 
-#ifdef _BITMAP_H_
 inline void fbdraw_draw_bitmap(unsigned int x, unsigned int y,
 			     struct bitmap *bm, uint32_t * colorfg,
 			     uint32_t * colorbg, struct fbdraw_info *fb)
@@ -97,6 +95,5 @@ inline void fbdraw_draw_bitmap(unsigned int x, unsigned int y,
 		}
 	}
 }
-#endif
 
 #endif
