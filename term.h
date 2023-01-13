@@ -19,12 +19,17 @@ void term_scrollup(struct term_info *term)
 		term->mem_length - term->line_length);
 	term->curp -= term->line_length;
 	// fill white after curp
-	memset(term->curp, '\0', term->mem + term->mem_length - term->curp);
+	int fill = term->line_length;
+	if ((term->curp + fill) > term->mem_end)
+		fill = term->mem_end - term->curp;
+	memset(term->curp, '\0', term->mem_end - term->curp);
 }
 
 void term_putc(char c, struct term_info *term)
 {
-	if (term->curp >= term->mem_end)
+	if (term->curp <= term->mem)
+		term->curp = term->mem;
+	while (term->curp >= term->mem_end)
 		term_scrollup(term);
 	*(term->curp) = c;
 	if (c == '\n' || c == '\r') {
@@ -32,6 +37,8 @@ void term_putc(char c, struct term_info *term)
 		    ((term->curp - term->mem) % term->line_length);
 	} else if (c == '\t') {
 		term->curp += 8;
+	} else if (c == '\b') {
+		term->curp -= 1;
 	} else {
 		term->curp += 1;
 	}
