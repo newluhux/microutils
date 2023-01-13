@@ -51,6 +51,9 @@ install: all
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/ufbterm
 
 
+check:
+	$(CC) *.h
+
 clean:
 	rm -fv *.gch
 	rm -fv ufbtest
