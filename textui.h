@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <termios.h>
-#include <errno.h>
 #include <unistd.h>
 #include <string.h>
 

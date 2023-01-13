@@ -2,6 +2,7 @@
 #define _TERM_H_
 
 #include <stdint.h>
+#include <string.h>
 
 struct term_info {
 	uint8_t *mem;

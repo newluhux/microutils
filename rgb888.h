@@ -1,3 +1,4 @@
+#ifndef _REG888_H_
 #define _RGB888_H_
 
 #define RGB888_RED   0b111111110000000000000000;

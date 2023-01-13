@@ -1,3 +1,4 @@
+#ifndef _REG565_H_
 #define _RGB565_H_
 
 #define RGB565_RED   0b1111100000000000;

@@ -1,8 +1,10 @@
 #ifndef _FBDRAW_H_
 #define _FBDRAW_H_
 
+#include <stddef.h>
 #include <stdint.h>
 #include "misc.h"
+#include "bitmap.h"
 
 struct fbdraw_info {
 	uint8_t *mem;
