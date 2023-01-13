@@ -71,9 +71,17 @@ int main(int argc, char *argv[])
 	}
 	// draw string
 	textui_drawstr(ttyfd, wsz.ws_col / 2, wsz.ws_row / 2, "Hello World");
-	textui_drawstr(ttyfd, wsz.ws_col / 2, wsz.ws_row / 2 + 1,
-		       "PRESS ANY KEY EXIT");
-	getchar();
+	int c;
+	char key[2];
+	key[1] = '\0';
+	while ((c = getchar()) != EOF) {
+		if (c == 'q') break;
+		textui_drawstr(ttyfd, wsz.ws_col / 2, wsz.ws_row / 2 + 1,
+			       "PRESS q EXIT");
+		key[0] = c;
+		textui_drawstr(ttyfd, wsz.ws_col / 2, wsz.ws_row / 2 + 2,
+				key);
+	}
 	textui_clearterm(ttyfd);
 
 	exit(EXIT_SUCCESS);
