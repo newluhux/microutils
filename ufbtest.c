@@ -31,7 +31,7 @@ void do_fill(struct fbdraw_info *fb, useconds_t delay)
 		if (delay > 0)
 			usleep(delay);
 		color = rand();
-		fbdraw_draw_rect_solid(0, 0, fb->xres, fb->yres, color,
+		fbdraw_rect_solid(0, 0, fb->xres, fb->yres, color,
 					    fb);
 	}
 }
@@ -46,7 +46,7 @@ void do_pixel(struct fbdraw_info *fb, useconds_t delay)
 		color = rand();
 		x = rand() % fb->xres;
 		y = rand() % fb->yres;
-		fbdraw_draw_pixel(x, y, color, fb);
+		fbdraw_pixel(x, y, color, fb);
 	}
 }
 
@@ -62,7 +62,7 @@ void do_rect(struct fbdraw_info *fb, useconds_t delay)
 		y = rand() % fb->yres;
 		w = rand() % (fb->xres - x);
 		h = rand() % (fb->yres - y);
-		fbdraw_draw_rect_solid(x, y, w, h, color, fb);
+		fbdraw_rect_solid(x, y, w, h, color, fb);
 	}
 }
 
@@ -76,8 +76,8 @@ void do_line(struct fbdraw_info *fb, useconds_t delay)
 		color = rand();
 		x = rand() % fb->xres;
 		y = rand() % fb->yres;
-		fbdraw_draw_xline(0, fb->xres, y, color, fb);
-		fbdraw_draw_yline(0, fb->yres, x, color, fb);
+		fbdraw_xline(0, fb->xres, y, color, fb);
+		fbdraw_yline(0, fb->yres, x, color, fb);
 	}
 }
 #ifdef _BITMAP_H_
@@ -99,7 +99,7 @@ void do_char(struct fbdraw_info *fb, useconds_t delay)
                 y = rand() % fb->yres;
 		c = rand() % 128;
 		bm.data = vga_font_8x8[c];
-		fbdraw_draw_bitmap(x,y,&bm,&colorfg,NULL,fb);
+		fbdraw_bitmap(x,y,&bm,&colorfg,NULL,fb);
 	}
 	return;
 }

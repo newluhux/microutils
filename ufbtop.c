@@ -33,7 +33,7 @@ int draw_string(unsigned int x, unsigned int y,
 	bm.h = default_font_h;
 	while (*s) {
 		bm.data = vga_font_8x8[(uint8_t)*s];
-		fbdraw_draw_bitmap(x, y, &bm, &colorfg, &colorbg, fb);
+		fbdraw_bitmap(x, y, &bm, &colorfg, &colorbg, fb);
 		x += bm.w;
 		s++;
 	}
@@ -45,7 +45,7 @@ int draw_progress_bar(unsigned int x, unsigned int y,
 		      uint32_t colorfg, uint32_t colorbg,
 		      unsigned short progress, struct fbdraw_info *fb)
 {
-	fbdraw_draw_rect(x, y, w, h, colorfg, fb);
+	fbdraw_rect(x, y, w, h, colorfg, fb);
 	float fw = w;
 	fw -= (float)x;
 	if (fw > 0) {
@@ -55,8 +55,8 @@ int draw_progress_bar(unsigned int x, unsigned int y,
 	if (progress >= 100)
 		fw = w;
 	unsigned int pw = (unsigned int)fw;
-	fbdraw_draw_rect_solid(x + 1, y + 1, pw - 2, h - 2, colorfg, fb);
-	fbdraw_draw_rect_solid(x + pw + 1, y + 1, w - pw - 2, h - 2,
+	fbdraw_rect_solid(x + 1, y + 1, pw - 2, h - 2, colorfg, fb);
+	fbdraw_rect_solid(x + pw + 1, y + 1, w - pw - 2, h - 2,
 				    colorbg, fb);
 	return 0;
 }
@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
 
 
 	// fill bg
-	fbdraw_draw_rect_solid(0, 0, fb.xres, fb.yres, bg, &fb);
+	fbdraw_rect_solid(0, 0, fb.xres, fb.yres, bg, &fb);
 	while (1) {
 		// get version
 		get_version(version_str, 256);

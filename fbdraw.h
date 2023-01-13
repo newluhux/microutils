@@ -13,7 +13,7 @@ struct fbdraw_info {
 	unsigned int line_length;
 };
 
-inline void fbdraw_draw_pixel(unsigned x, unsigned int y,
+inline void fbdraw_pixel(unsigned x, unsigned int y,
 			    uint32_t color, struct fbdraw_info *fb)
 {
 	if ((x >= fb->xres) || (y >= fb->yres))
@@ -36,48 +36,48 @@ inline void fbdraw_draw_pixel(unsigned x, unsigned int y,
 	}
 }
 
-inline void fbdraw_draw_xline(unsigned x0, unsigned x1, unsigned int y,
+inline void fbdraw_xline(unsigned x0, unsigned x1, unsigned int y,
 			    uint32_t color, struct fbdraw_info *fb)
 {
 	unsigned int xmin = MIN(x0, x1);
 	unsigned int xmax = MAX(x0, x1);
 	for (; xmin <= xmax; xmin++)
-		fbdraw_draw_pixel(xmin, y, color, fb);
+		fbdraw_pixel(xmin, y, color, fb);
 }
 
-inline void fbdraw_draw_yline(unsigned y0, unsigned y1, unsigned int x,
+inline void fbdraw_yline(unsigned y0, unsigned y1, unsigned int x,
 			    uint32_t color, struct fbdraw_info *fb)
 {
 	unsigned int ymin = MIN(y0, y1);
 	unsigned int ymax = MAX(y0, y1);
 	for (; ymin <= ymax; ymin++)
-		fbdraw_draw_pixel(x, ymin, color, fb);
+		fbdraw_pixel(x, ymin, color, fb);
 }
 
-inline void fbdraw_draw_rect(unsigned int x, unsigned int y,
+inline void fbdraw_rect(unsigned int x, unsigned int y,
 			   unsigned int w, unsigned int h,
 			   uint32_t color, struct fbdraw_info *fb)
 {
 	// draw up
-	fbdraw_draw_xline(x, x + w, y, color, fb);
+	fbdraw_xline(x, x + w, y, color, fb);
 	// draw down
-	fbdraw_draw_xline(x, x + w, y + h, color, fb);
+	fbdraw_xline(x, x + w, y + h, color, fb);
 	// draw left
-	fbdraw_draw_yline(y, y + h, x, color, fb);
+	fbdraw_yline(y, y + h, x, color, fb);
 	// draw right
-	fbdraw_draw_yline(y, y + h, x + w, color, fb);
+	fbdraw_yline(y, y + h, x + w, color, fb);
 }
 
-inline void fbdraw_draw_rect_solid(unsigned int x, unsigned int y,
+inline void fbdraw_rect_solid(unsigned int x, unsigned int y,
 				 unsigned int w, unsigned int h,
 				 uint32_t color, struct fbdraw_info *fb)
 {
 	unsigned int ycur;
 	for (ycur = y; ycur <= (y + h); ycur++)
-		fbdraw_draw_xline(x, x + w, ycur, color, fb);
+		fbdraw_xline(x, x + w, ycur, color, fb);
 }
 
-inline void fbdraw_draw_bitmap(unsigned int x, unsigned int y,
+inline void fbdraw_bitmap(unsigned int x, unsigned int y,
 			     struct bitmap *bm, uint32_t * colorfg,
 			     uint32_t * colorbg, struct fbdraw_info *fb)
 {
@@ -86,10 +86,10 @@ inline void fbdraw_draw_bitmap(unsigned int x, unsigned int y,
 	for (by = 0; by < bm->h; by++) {
 		for (bx = 0; bx < bm->w; bx++) {
 			if ((*(bmdata + by) & 1 << bx) && colorfg != NULL) {
-				fbdraw_draw_pixel(bx + x, by + y,
+				fbdraw_pixel(bx + x, by + y,
 						       *colorfg, fb);
 			} else if (colorbg != NULL) {
-				fbdraw_draw_pixel(bx + x, by + y,
+				fbdraw_pixel(bx + x, by + y,
 						       *colorbg, fb);
 			}
 		}
