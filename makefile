@@ -2,7 +2,7 @@ CFLAGS += -Wall -Wextra -static -O3
 
 PREFIX ?= /usr/local
 
-all: ufbtest umemdump ustardict umemtest utermhello ufbtop ufbterm
+all: ufbtest umemdump ustardict umemtest utermhello usnake ufbtop ufbterm
 
 ufbtest:
 	$(CC) $(CFLAGS) ufbtest.c -o ufbtest
@@ -18,6 +18,9 @@ umemtest:
 
 utermhello:
 	$(CC) $(CFLAGS) utermhello.c -o utermhello
+
+usnake:
+	$(CC) $(CFLAGS) usnake.c -o usnake
 
 ufbtop:
 	$(CC) $(CFLAGS) ufbtop.c -o ufbtop
@@ -62,5 +65,6 @@ clean:
 	rm -fv ustardict
 	rm -fv umemtest
 	rm -fv utermhello
+	rm -fv usnake
 	rm -fv ufbtop
 	rm -fv ufbterm

@@ -17,6 +17,8 @@ some micro tools written by LuHui <luhux76@gmail>
 
 - ufbterm: dumb terminal emulator on framebuffer
 
+- usnake: minimal terminal snake game
+
 ** DEPEND
 
 linux-headers
