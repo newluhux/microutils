@@ -111,9 +111,12 @@ int main(int argc, char *argv[])
 	int x = atoi(argv[3]);
 	int y = atoi(argv[4]);
 
-	int c;
-	while ((c = getchar()) != EOF) {
-		term_putc(c, &term);
+	int i;
+	char linebuf[BUFSIZ];
+	while (fgets(linebuf, BUFSIZ, stdin) != NULL) {
+		for (i = 0; linebuf[i] != '\0'; i++) {
+			term_putc(linebuf[i], &term);
+		}
 		draw_term(x, y, fg, bg, &fb, &term);
 	}
 
