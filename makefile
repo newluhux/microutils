@@ -55,6 +55,7 @@ check:
 	$(CC) *.h
 
 clean:
+	rm -fv *.out
 	rm -fv *.gch
 	rm -fv ufbtest
 	rm -fv umemdump
