@@ -15,31 +15,26 @@
 
 #define FBDEV_DEFAULT "/dev/fb0"
 
-void draw_term(unsigned int x, unsigned int y,
+void draw_term(int x, int y,
 	       uint32_t colorfg, uint32_t colorbg,
 	       struct fbdraw_info *fb, struct term_info *term)
 {
-	unsigned int tx, ty;
-	unsigned int fx, fy;
-	uint8_t *termp = term->mem;
 	struct bitmap bm;
 	memset(&bm, 0, sizeof(bm));
 	bm.w = 8;
 	bm.h = 8;
 
-	fx = x;
-	fy = y;
+	unsigned int term_row;
+	unsigned int term_col;
+	unsigned char c;
 
-	for (ty = 0; ty < term->line_nums; ty++) {
-		for (tx = 0; tx < term->line_length; tx++) {
-			bm.data = vga_font_8x8[(uint8_t)*termp];
-			fbdraw_bitmap(fx, fy, &bm,
-						&colorfg, &colorbg, fb);
-			fx += bm.w;
-			termp++;
+	for (term_row = 0; term_row < term->line_nums; term_row++) {
+		for (term_col = 0; term_col < term->line_length; term_col++) {
+			c = term->mem[term_row * term->line_length + term_col];
+			bm.data = vga_font_8x8[c];
+			fbdraw_bitmap(x + term_col * bm.w, y + term_row * bm.h,
+					&bm, &colorfg, &colorbg, fb);
 		}
-		fx = x;
-		fy += bm.h;
 	}
 }
 
@@ -113,8 +108,8 @@ int main(int argc, char *argv[])
 	uint32_t bg = 0xFFFFFFFF;
 	uint32_t fg = 0x0;
 
-	unsigned int x = atoi(argv[3]);
-	unsigned int y = atoi(argv[3]);
+	int x = atoi(argv[3]);
+	int y = atoi(argv[4]);
 
 	int c;
 	while ((c = getchar()) != EOF) {
