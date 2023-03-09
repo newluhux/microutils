@@ -50,14 +50,17 @@ install: all
 	cp -f utermhello $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/utermhello
 
+	cp -f usnake $(DESTDIR)$(PREFIX)/bin/
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/usnake
+
 	cp -f ufbtop $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/ufbtop
 
 	cp -f ufbterm $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/ufbterm
 
-	cp -f unc $(DESTDIR$(PREFIX)/bin/
-	chmod 755 $DESTDIR)$(PREFIX)/bin/unc
+	cp -f unc $(DESTDIR)$(PREFIX)/bin/
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/unc
 
 
 check:
