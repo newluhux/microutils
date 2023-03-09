@@ -1,6 +1,6 @@
 * microutils
 
-some micro tools written by LuHui <luhux76@gmail>
+some micro tools written by Lu Hui <luhux76@gmail.com>
 
 
 - ufbtest: framebuffer test
@@ -18,6 +18,8 @@ some micro tools written by LuHui <luhux76@gmail>
 - ufbterm: dumb terminal emulator on framebuffer
 
 - usnake: minimal terminal snake game
+
+- unc: minimal netcat program
 
 ** DEPEND
 
