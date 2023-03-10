@@ -21,6 +21,8 @@ some micro tools written by Lu Hui <luhux76@gmail.com>
 
 - unc: minimal netcat program
 
+- utftp: simple tftp client
+
 ** DEPEND
 
 linux-headers

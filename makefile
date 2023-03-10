@@ -2,7 +2,7 @@ CFLAGS += -Wall -Wextra -static -O3
 
 PREFIX ?= /usr/local
 
-all: ufbtest umemdump ustardict umemtest utermhello usnake ufbtop ufbterm unc
+all: ufbtest umemdump ustardict umemtest utermhello usnake ufbtop ufbterm unc utftp
 
 ufbtest:
 	$(CC) $(CFLAGS) ufbtest.c -o ufbtest
@@ -30,6 +30,9 @@ ufbterm:
 
 unc:
 	$(CC) $(CFLAGS) unc.c -o unc
+
+utftp:
+	$(CC) $(CFLAGS) utftp.c -o utftp
 
 
 install: all
@@ -62,6 +65,8 @@ install: all
 	cp -f unc $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/unc
 
+	cp -f utftp $(DESTDIR)$(PREFIX)/bin/
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/utftp
 
 check:
 	$(CC) *.h
@@ -78,3 +83,4 @@ clean:
 	rm -fv ufbtop
 	rm -fv ufbterm
 	rm -fv unc
+	rm -fv utftp
