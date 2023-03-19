@@ -59,14 +59,14 @@ void mips32_instr2asm(uint32_t instr, char *out, int outsize)
 	}
 
 	if (mips32_opcode[op][0] == 'j') {
-		snprintf(out, outsize, "%s %08x", mips32_opcode[op], dt);
+		snprintf(out, outsize, "%s %08x", mips32_opcode[op], dt << 2);
 		return;
 	}
 
 	if (mips32_opcode[op][0] == 'b') {
 		snprintf(out, outsize, "%s %s %s %04x",
 			 mips32_opcode[op], mips32_regname[rs],
-			 mips32_regname[rt], im);
+			 mips32_regname[rt], im << 2);
 		return;
 	}
 
