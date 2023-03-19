@@ -23,6 +23,8 @@ some micro tools written by Lu Hui <luhux76@gmail.com>
 
 - utftp: simple tftp client
 
+- umips32dis: simple too convert binary data to mips32 instruction
+
 ** DEPEND
 
 linux-headers
