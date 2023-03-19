@@ -26,29 +26,34 @@ void mips32_instr2asm(uint32_t instr, char *out, int outsize)
 	unsigned dt = MIPS32_GET_DT(instr);
 	unsigned im = MIPS32_GET_IM(instr);
 
+	char temp[LINEMAX];
+	temp[0] = '\0';
 	if (op == 0) {
+		if (fn <= 7) {
+			snprintf(temp, LINEMAX, "%02x", sh);
+		}
 		snprintf(out, outsize,
-			 "%s %s %s %s %02x",
+			 "%s %s %s %s %s",
 			 mips32_special_func[fn],
 			 mips32_regname[rd], mips32_regname[rs],
-			 mips32_regname[rt], sh);
+			 mips32_regname[rt], temp);
 		return;
 	}
 
 	if (op == 28) {
 		snprintf(out, outsize,
-			 "%s %s %s %s %02x",
+			 "%s %s %s %s",
 			 mips32_special2_func[fn],
 			 mips32_regname[rd], mips32_regname[rs],
-			 mips32_regname[rt], sh);
+			 mips32_regname[rt]);
 		return;
 	}
 	if (op == 31) {
 		snprintf(out, outsize,
-			 "%s %s %s %s %02x",
+			 "%s %s %s %s",
 			 mips32_special3_func[fn],
 			 mips32_regname[rd],
-			 mips32_regname[rs], mips32_regname[rt], sh);
+			 mips32_regname[rs], mips32_regname[rt]);
 		return;
 	}
 
