@@ -1,6 +1,8 @@
 #ifndef _BIT_OPS_
 #define _BIT_OPS_
 
+#include <stdint.h>
+
 /*
  * Bitops Module
  *

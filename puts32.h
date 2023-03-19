@@ -4,6 +4,7 @@
 /* my embedded board need this, because printf is toooo big */
 
 #include <stdint.h>
+#include <stdio.h>
 
 #define putc putchar
 

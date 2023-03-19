@@ -1,6 +1,10 @@
 #ifndef _TFTP_H_
 #define _TFTP_H_
 
+#include <stdint.h>
+#include <string.h>
+#include <arpa/inet.h>
+
 /*
 https://datatracker.ietf.org/doc/html/rfc1350
 */
