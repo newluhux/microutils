@@ -2,7 +2,7 @@ CFLAGS += -Wall -Wextra -static -O3
 
 PREFIX ?= /usr/local
 
-all: ufbtest umemdump ustardict umemtest utermhello usnake ufbtop ufbterm unc utftp umips32dis ukermit
+all: ufbtest umemdump ustardict umemtest utermhello usnake ufbtop ufbterm unc utftp umips32dis ukermit uns
 
 ufbtest:
 	$(CC) $(CFLAGS) ufbtest.c -o ufbtest
@@ -39,6 +39,9 @@ umips32dis:
 
 ukermit:
 	$(CC) $(CFLAGS) ukermit.c -o ukermit
+
+uns:
+	$(CC) $(CFLAGS) uns.c -o uns
 
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
@@ -79,6 +82,9 @@ install: all
 	cp -f ukermit $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/ukermit
 
+	cp -f uns $(DESTDIR)$(PREFIX)/bin/
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/uns
+
 check:
 	$(CC) *.h
 
@@ -97,3 +103,4 @@ clean:
 	rm -fv utftp
 	rm -fv umips32dis
 	rm -fv ukermit
+	rm -fv uns

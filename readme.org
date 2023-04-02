@@ -19,13 +19,15 @@ some micro tools written by Lu Hui <luhux76@gmail.com>
 
 - usnake: minimal terminal snake game
 
-- unc: minimal netcat program
+- unc: minimal netcat client program
 
 - utftp: simple tftp client
 
 - umips32dis: simple too convert binary data to mips32 instruction
 
 - ukermit: simple kermit impl.
+
+- uns: minimal netcat server program 
 
 ** DEPEND
 
