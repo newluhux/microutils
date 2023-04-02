@@ -38,24 +38,24 @@ ssize_t ewrite(int fd, const void *buf, size_t count)
 	return ret;
 }
 
-void handle_output(int fd)
+void rx(int sockfd)
 {
 	ssize_t nr;
 	ssize_t nw;
 	unsigned char buf[BUFSIZ];
-	while ((nr = eread(fd, buf, BUFSIZ)) > 0) {
+	while ((nr = eread(sockfd, buf, BUFSIZ)) > 0) {
 		while ((nw = ewrite(STDOUT_FILENO, buf, nr)) != nr) {
 		}
 	}
 }
 
-void handle_input(int fd)
+void tx(int sockfd)
 {
 	ssize_t nr;
 	ssize_t nw;
-	char c;
-	while ((nr = eread(STDIN_FILENO, &c, sizeof(c))) > 0) {
-		while ((nw = ewrite(fd, &c, sizeof(c)) != nr)) {
+	unsigned char buf[BUFSIZ];
+	while ((nr = eread(STDIN_FILENO, buf, BUFSIZ)) > 0) {
+		while ((nw = ewrite(sockfd, buf, nr) != nr)) {
 		}
 	}
 }
@@ -115,14 +115,14 @@ int main(int argc, char *argv[])
 	switch (child_pid) {
 	case 0:
 		close(STDIN_FILENO);
-		handle_output(socket_fd);
+		rx(socket_fd);
 		break;
 	case -1:
 		fprintf(stderr, "can't fork, REASON: %s\n", strerror(errno));
 		break;
 	default:
 		close(STDOUT_FILENO);
-		handle_input(socket_fd);
+		tx(socket_fd);
 		break;
 	}
 	kill(child_pid, SIGTERM);
