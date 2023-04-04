@@ -30,7 +30,7 @@ void mips32_instr2asm(uint32_t instr, char *out, int outsize)
 	temp[0] = '\0';
 	if (op == 0) {
 		if (fn <= 7) {
-			snprintf(temp, LINEMAX, "%02x", sh);
+			snprintf(temp, LINEMAX, "0x%02x", sh);
 		}
 		snprintf(out, outsize,
 			 "%s %s %s %s %s",
@@ -58,32 +58,32 @@ void mips32_instr2asm(uint32_t instr, char *out, int outsize)
 	}
 
 	if (op == 1) {
-		snprintf(out, outsize, "%s %s %04x",
+		snprintf(out, outsize, "%s %s 0x%04x",
 			 mips32_regimm_rt[rt], mips32_regname[rs], im);
 		return;
 	}
 
 	if (mips32_opcode[op][0] == 'j') {
-		snprintf(out, outsize, "%s %08x", mips32_opcode[op], dt << 2);
+		snprintf(out, outsize, "%s 0x%08x", mips32_opcode[op], dt << 2);
 		return;
 	}
 
 	if (mips32_opcode[op][0] == 'b') {
-		snprintf(out, outsize, "%s %s %s %04x",
+		snprintf(out, outsize, "%s %s %s 0x%04x",
 			 mips32_opcode[op], mips32_regname[rs],
 			 mips32_regname[rt], im << 2);
 		return;
 	}
 
 	if (op >= 8 && op <= 15) {
-		snprintf(out, outsize, "%s %s %s %04x",
+		snprintf(out, outsize, "%s %s %s 0x%04x",
 			 mips32_opcode[op], mips32_regname[rt],
 			 mips32_regname[rs], im);
 		return;
 	}
 
 	if (op >= 32 && op <= 63) {
-		snprintf(out, outsize, "%s %s %04x(%02x)",
+		snprintf(out, outsize, "%s %s 0x%04x(0x%02x)",
 			 mips32_opcode[op], mips32_regname[rt], im, rs);
 		return;
 	}
@@ -91,13 +91,13 @@ void mips32_instr2asm(uint32_t instr, char *out, int outsize)
 	/* for cop0 */
 	unsigned sel = MIPS32_GET_SEL(instr);
 	if (op == 16) {
-		snprintf(out, outsize, "%s %s %s %01x",
+		snprintf(out, outsize, "%s %s %s 0x%01x",
 			 mips32_cop0_rs[rs], mips32_regname[rt],
 			 mips32_regname[rd], sel);
 		return;
 	}
 
-	snprintf(out, outsize, "unknown instruction, op:%02x", op);
+	snprintf(out, outsize, "unknown instruction, op:0x%02x", op);
 	return;
 }
 
