@@ -54,6 +54,11 @@ int kermit_trans(uint8_t * param, uint8_t * txbuf, uint8_t * rxbuf)
 	if (ewrite(STDOUT_FILENO, txbuf, txlen) != txlen) {
 		return -1;
 	}
+	uint8_t eol;
+	eol = kermit_unchar(param[KERMIT_PARAM_EOL]);
+	if (ewrite(STDOUT_FILENO, &eol, sizeof(eol)) != sizeof(eol)) {
+		return -1;
+	}
 	alarm(kermit_unchar(param[KERMIT_PARAM_TIME]));
 
 	uint8_t *rxbufp = rxbuf;
