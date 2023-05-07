@@ -1,6 +1,7 @@
 *~
 *.out
 *.gch
+.ccls-cache/
 core
 ufbtest
 umemdump
