@@ -45,6 +45,9 @@ void timer_handle(int i)
 
 	uint8_t txlen = kermit_unchar(txbuf[KERMIT_HDR_LEN]) + 2;
 	ewrite(STDOUT_FILENO, txbuf, txlen);
+        uint8_t eol;
+        eol = kermit_unchar(param[KERMIT_PARAM_EOL]);
+        ewrite(STDOUT_FILENO, &eol, sizeof(eol));
 	alarm(kermit_unchar(param[KERMIT_PARAM_TIME]));
 }
 
