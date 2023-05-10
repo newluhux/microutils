@@ -2,16 +2,13 @@ CFLAGS += -Wall -Wextra -static -O3
 
 PREFIX ?= /usr/local
 
-all: ufbtest umemdump ustardict umemtest utermhello usnake ufbtop ufbterm unc utftp umips32dis uns
+all: ufbtest umemdump umemtest utermhello usnake ufbtop ufbterm unc utftp umips32dis uns
 
 ufbtest:
 	$(CC) $(CFLAGS) ufbtest.c -o ufbtest
 
 umemdump:
 	$(CC) $(CFLAGS) umemdump.c -o umemdump
-
-ustardict:
-	$(CC) $(CFLAGS) ustardict.c -o ustardict
 
 umemtest:
 	$(CC) $(CFLAGS) umemtest.c -o umemtest
@@ -49,9 +46,6 @@ install: all
 	cp -f umemdump $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/umemdump
 
-	cp -f ustardict $(DESTDIR)$(PREFIX)/bin/
-	chmod 755 $(DESTDIR)$(PREFIX)/bin/ustardict
-
 	cp -f umemtest $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/umemtest
 
@@ -87,7 +81,6 @@ clean:
 	rm -fv *.gch
 	rm -fv ufbtest
 	rm -fv umemdump
-	rm -fv ustardict
 	rm -fv umemtest
 	rm -fv utermhello
 	rm -fv usnake

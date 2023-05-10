@@ -9,8 +9,6 @@ some micro tools written by Lu Hui <luhux76@gmail.com>
 
 - memtest: memory test
 
-- ustardict: dictionary
-
 - utermhello: a curses-like hello world program, but not depend curses
 
 - ufbtop: display system info on framebuffer
